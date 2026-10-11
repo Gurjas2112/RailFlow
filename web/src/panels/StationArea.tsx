@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Component, Suspense, lazy, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import Gantt from "../gantt/Gantt";
 import TopView2D from "../sim/TopView2D";
@@ -17,13 +17,23 @@ export default function StationArea({ height, allow3d, lowPower }: { height: num
     <section className="space-y-2" aria-label={t("panel.station")}>
       <ViewBar allow3d={allow3d} />
       {mainView === "gantt" ? <Gantt pxPerMin={lowPower ? 3 : 4} /> : use3d ? (
-        <Suspense fallback={<div className="grid place-items-center rounded-lg border border-line text-muted" style={{ height }}>{t("app.loading")}</div>}>
-          <Station3D height={height} lowPower={lowPower} />
-        </Suspense>
+        <Fallback2D fallback={<TopView2D height={Math.min(height, 360)} />}>
+          <Suspense fallback={<div className="grid place-items-center rounded-lg border border-line text-muted" style={{ height }}>{t("app.loading")}</div>}>
+            <Station3D height={height} lowPower={lowPower} />
+          </Suspense>
+        </Fallback2D>
       ) : <TopView2D height={Math.min(height, 360)} />}
       <Legend />
     </section>
   );
+}
+
+/** If the 3D view throws (WebGL lost, driver bug), show the 2D top view instead of taking the page down. */
+class Fallback2D extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(e: unknown) { console.error("3D view failed; showing the 2D top view", e); }
+  render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
 function Legend() {

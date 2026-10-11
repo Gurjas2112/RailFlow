@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Billboard, Html, RoundedBox, Text } from "@react-three/drei";
+import { Billboard, RoundedBox, Text } from "@react-three/drei";
 import * as THREE from "three";
 import type { Assignment } from "../api/client";
 import { trainPose } from "./pose";
@@ -16,7 +16,10 @@ export default function Train({ a, zOf, reduced, lowPower }: Props) {
   const ref = useRef<THREE.Group>(null!);
   const mat = useRef<THREE.MeshStandardMaterial>(null);
   const label = useRef<THREE.Group>(null);
-  const tag = useRef<HTMLDivElement>(null);
+  // Delay tag is a troika Text mesh, not drei <Html>: each <Html> owns a separate React root, and remounting
+  // 30 trains on a view change unmounted those roots mid-render (React 19 removeChild crash).
+  const tag = useRef<THREE.Mesh & { text: string; sync: () => void }>(null);
+  const tagText = useRef("");
   const color = useRef(new THREE.Color());
   useFrame(({ clock }) => {
     const s = useSim.getState();
@@ -38,8 +41,9 @@ export default function Train({ a, zOf, reduced, lowPower }: Props) {
     if (label.current) label.current.visible = !lowPower || s.selected === a.train_id || conflicts.has(a.train_id);
     if (tag.current) {
       const d = delays.get(a.train_id);
-      tag.current.style.display = d ? "block" : "none";
-      tag.current.textContent = d ? `+${d}m` : "";
+      const txt = d ? `+${d}m` : "";
+      tag.current.visible = !!d;
+      if (txt !== tagText.current) { tagText.current = txt; tag.current.text = txt; tag.current.sync(); }
     }
   });
   return (
@@ -52,9 +56,10 @@ export default function Train({ a, zOf, reduced, lowPower }: Props) {
           <Text font={LABEL_FONT} fontSize={1.6} color="#E6EDF2" outlineWidth={0.08} outlineColor="#0B0F14">{a.train_id}</Text>
         </Billboard>
       </group>
-      <Html position={[15, 3.2, 0]} center zIndexRange={[20, 0]}>
-        <div ref={tag} className="num rounded bg-delayed px-1 text-xs font-semibold text-black" style={{ display: "none" }} />
-      </Html>
+      <Billboard position={[15, 3.2, 0]}>
+        <Text ref={tag} visible={false} font={LABEL_FONT} fontSize={1.5} color={STATE_HEX.delayed}
+          outlineWidth={0.1} outlineColor="#0B0F14">{""}</Text>
+      </Billboard>
     </group>
   );
 }
