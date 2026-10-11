@@ -1,0 +1,631 @@
+{
+  "station": "SVNJ",
+  "day": "Sun",
+  "trains": [
+    {
+      "id": "11101",
+      "name": "Ghatmatha Express (fictional)",
+      "type": "MEX",
+      "origin": "BMGD",
+      "destination": "DGWD",
+      "direction": "DN",
+      "arr": "12:05",
+      "dep": "12:15",
+      "platform": "P1",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 24,
+      "days": "Daily",
+      "priority": 2,
+      "wagons": null
+    },
+    {
+      "id": "51102",
+      "name": "Mula Passenger (fictional)",
+      "type": "PAS",
+      "origin": "HRGD",
+      "destination": "EKLN",
+      "direction": "UP",
+      "arr": "12:10",
+      "dep": "12:28",
+      "platform": "P2",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 18,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "61103",
+      "name": "Pavana MEMU (fictional)",
+      "type": "MEMU",
+      "origin": "PVNG",
+      "destination": "SVNJ",
+      "direction": "DN",
+      "arr": "12:15",
+      "dep": "12:25",
+      "platform": "P5",
+      "required_platform": "P5",
+      "allowed_platforms": [
+        "P5"
+      ],
+      "coaches": 12,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "11104",
+      "name": "Deccan Ridge Express (fictional)",
+      "type": "MEX",
+      "origin": "DGWD",
+      "destination": "BMGD",
+      "direction": "UP",
+      "arr": "12:30",
+      "dep": "12:42",
+      "platform": "P3",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 24,
+      "days": "Daily",
+      "priority": 2,
+      "wagons": null
+    },
+    {
+      "id": "GDS-4105",
+      "name": "Plateau Goods (BCN rake) (fictional)",
+      "type": "GDS",
+      "origin": "KLGT",
+      "destination": "NRGD",
+      "direction": "DN",
+      "arr": "12:40",
+      "dep": "12:55",
+      "platform": "P4",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P4"
+      ],
+      "days": "Daily",
+      "priority": 4,
+      "wagons": 58,
+      "coaches": null
+    },
+    {
+      "id": "12201",
+      "name": "Sahyadri Crest SF Express (fictional)",
+      "type": "SF",
+      "origin": "AMBP",
+      "destination": "CNDP",
+      "direction": "DN",
+      "arr": "13:05",
+      "dep": "13:15",
+      "platform": "P1",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2"
+      ],
+      "coaches": 26,
+      "days": "Daily",
+      "priority": 1,
+      "wagons": null
+    },
+    {
+      "id": "51210",
+      "name": "Indrayani Valley Passenger (fictional)",
+      "type": "PAS",
+      "origin": "HRGD",
+      "destination": "EKLN",
+      "direction": "UP",
+      "arr": "13:10",
+      "dep": "13:30",
+      "platform": "P2",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 18,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "61305",
+      "name": "Pavana MEMU (fictional)",
+      "type": "MEMU",
+      "origin": "PVNG",
+      "destination": "SVNJ",
+      "direction": "DN",
+      "arr": "13:20",
+      "dep": "13:30",
+      "platform": "P5",
+      "required_platform": "P5",
+      "allowed_platforms": [
+        "P5"
+      ],
+      "coaches": 12,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "11214",
+      "name": "Konkan Gate Express (fictional)",
+      "type": "MEX",
+      "origin": "DGWD",
+      "destination": "BMGD",
+      "direction": "UP",
+      "arr": "13:40",
+      "dep": "13:55",
+      "platform": "P1",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 24,
+      "days": "Daily",
+      "priority": 2,
+      "wagons": null
+    },
+    {
+      "id": "61307",
+      "name": "Pavana MEMU (fictional)",
+      "type": "MEMU",
+      "origin": "PVNG",
+      "destination": "SVNJ",
+      "direction": "DN",
+      "arr": "13:45",
+      "dep": "13:55",
+      "platform": "P5",
+      "required_platform": "P5",
+      "allowed_platforms": [
+        "P5"
+      ],
+      "coaches": 12,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "11216",
+      "name": "Bhimashankar Express (fictional)",
+      "type": "MEX",
+      "origin": "DGWD",
+      "destination": "BMGD",
+      "direction": "UP",
+      "arr": "13:58",
+      "dep": "14:08",
+      "platform": "P1",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 24,
+      "days": "Daily",
+      "priority": 2,
+      "wagons": null
+    },
+    {
+      "id": "51218",
+      "name": "Mula Passenger (fictional)",
+      "type": "PAS",
+      "origin": "HRGD",
+      "destination": "EKLN",
+      "direction": "UP",
+      "arr": "14:00",
+      "dep": "14:20",
+      "platform": "P2",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 18,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "11209",
+      "name": "Shivneri Fort Express (fictional)",
+      "type": "MEX",
+      "origin": "BMGD",
+      "destination": "DGWD",
+      "direction": "DN",
+      "arr": "14:02",
+      "dep": "14:12",
+      "platform": "P3",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 24,
+      "days": "Daily",
+      "priority": 2,
+      "wagons": null
+    },
+    {
+      "id": "61311",
+      "name": "Pavana MEMU (fictional)",
+      "type": "MEMU",
+      "origin": "PVNG",
+      "destination": "SVNJ",
+      "direction": "DN",
+      "arr": "14:05",
+      "dep": "14:15",
+      "platform": "P5",
+      "required_platform": "P5",
+      "allowed_platforms": [
+        "P5"
+      ],
+      "coaches": 12,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "51219",
+      "name": "Nira Passenger (fictional)",
+      "type": "PAS",
+      "origin": "EKLN",
+      "destination": "HRGD",
+      "direction": "DN",
+      "arr": "14:22",
+      "dep": "14:27",
+      "platform": "P2",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 18,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "51214",
+      "name": "Godavari Link Passenger (fictional)",
+      "type": "PAS",
+      "origin": "HRGD",
+      "destination": "EKLN",
+      "direction": "UP",
+      "arr": "14:25",
+      "dep": "14:40",
+      "platform": "P4",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 18,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "12222",
+      "name": "Deccan Ridge Express (fictional)",
+      "type": "SF",
+      "origin": "CNDP",
+      "destination": "AMBP",
+      "direction": "UP",
+      "arr": "14:30",
+      "dep": "14:42",
+      "platform": "P1",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2"
+      ],
+      "coaches": 26,
+      "days": "Daily",
+      "priority": 1,
+      "wagons": null
+    },
+    {
+      "id": "51215",
+      "name": "Krishna Passenger (fictional)",
+      "type": "PAS",
+      "origin": "EKLN",
+      "destination": "HRGD",
+      "direction": "DN",
+      "arr": "14:35",
+      "dep": "14:45",
+      "platform": "P4",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 18,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "11217",
+      "name": "Ghatmatha Express (fictional)",
+      "type": "MEX",
+      "origin": "BMGD",
+      "destination": "DGWD",
+      "direction": "DN",
+      "arr": "14:50",
+      "dep": "15:02",
+      "platform": "P3",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 24,
+      "days": "Daily",
+      "priority": 2,
+      "wagons": null
+    },
+    {
+      "id": "61317",
+      "name": "Pavana MEMU (fictional)",
+      "type": "MEMU",
+      "origin": "PVNG",
+      "destination": "SVNJ",
+      "direction": "DN",
+      "arr": "15:00",
+      "dep": "15:10",
+      "platform": "P5",
+      "required_platform": "P5",
+      "allowed_platforms": [
+        "P5"
+      ],
+      "coaches": 12,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "51226",
+      "name": "Indrayani Valley Passenger (fictional)",
+      "type": "PAS",
+      "origin": "HRGD",
+      "destination": "EKLN",
+      "direction": "UP",
+      "arr": "15:05",
+      "dep": "15:25",
+      "platform": "P2",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 18,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "12230",
+      "name": "Sahyadri Crest SF Express (fictional)",
+      "type": "SF",
+      "origin": "CNDP",
+      "destination": "AMBP",
+      "direction": "UP",
+      "arr": "15:15",
+      "dep": "15:28",
+      "platform": "P1",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2"
+      ],
+      "coaches": 26,
+      "days": "Daily",
+      "priority": 1,
+      "wagons": null
+    },
+    {
+      "id": "51222",
+      "name": "Godavari Link Passenger (fictional)",
+      "type": "PAS",
+      "origin": "HRGD",
+      "destination": "EKLN",
+      "direction": "UP",
+      "arr": "15:15",
+      "dep": "15:30",
+      "platform": "P4",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 18,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "11225",
+      "name": "Konkan Gate Express (fictional)",
+      "type": "MEX",
+      "origin": "BMGD",
+      "destination": "DGWD",
+      "direction": "DN",
+      "arr": "15:40",
+      "dep": "15:52",
+      "platform": "P3",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 24,
+      "days": "Daily",
+      "priority": 2,
+      "wagons": null
+    },
+    {
+      "id": "12233",
+      "name": "Bhimashankar Express (fictional)",
+      "type": "SF",
+      "origin": "AMBP",
+      "destination": "CNDP",
+      "direction": "DN",
+      "arr": "16:05",
+      "dep": "16:17",
+      "platform": "P1",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2"
+      ],
+      "coaches": 26,
+      "days": "Daily",
+      "priority": 1,
+      "wagons": null
+    },
+    {
+      "id": "51234",
+      "name": "Nira Passenger (fictional)",
+      "type": "PAS",
+      "origin": "HRGD",
+      "destination": "EKLN",
+      "direction": "UP",
+      "arr": "16:10",
+      "dep": "16:30",
+      "platform": "P2",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 18,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "61321",
+      "name": "Pavana MEMU (fictional)",
+      "type": "MEMU",
+      "origin": "PVNG",
+      "destination": "SVNJ",
+      "direction": "DN",
+      "arr": "16:15",
+      "dep": "16:25",
+      "platform": "P5",
+      "required_platform": "P5",
+      "allowed_platforms": [
+        "P5"
+      ],
+      "coaches": 12,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    },
+    {
+      "id": "11236",
+      "name": "Shivneri Fort Express (fictional)",
+      "type": "MEX",
+      "origin": "DGWD",
+      "destination": "BMGD",
+      "direction": "UP",
+      "arr": "16:35",
+      "dep": "16:47",
+      "platform": "P3",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "coaches": 24,
+      "days": "Daily",
+      "priority": 2,
+      "wagons": null
+    },
+    {
+      "id": "GDS-4237",
+      "name": "Plateau Goods (BCN rake) (fictional)",
+      "type": "GDS",
+      "origin": "KLGT",
+      "destination": "NRGD",
+      "direction": "DN",
+      "arr": "16:40",
+      "dep": "16:55",
+      "platform": "P4",
+      "required_platform": null,
+      "allowed_platforms": [
+        "P4"
+      ],
+      "days": "Daily",
+      "priority": 4,
+      "wagons": 58,
+      "coaches": null
+    },
+    {
+      "id": "61325",
+      "name": "Pavana MEMU (fictional)",
+      "type": "MEMU",
+      "origin": "PVNG",
+      "destination": "SVNJ",
+      "direction": "DN",
+      "arr": "16:45",
+      "dep": "16:55",
+      "platform": "P5",
+      "required_platform": "P5",
+      "allowed_platforms": [
+        "P5"
+      ],
+      "coaches": 12,
+      "days": "Daily",
+      "priority": 3,
+      "wagons": null
+    }
+  ]
+}

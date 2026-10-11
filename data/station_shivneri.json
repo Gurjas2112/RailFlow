@@ -1,0 +1,115 @@
+{
+  "id": "SVNJ",
+  "code": "SVNJ",
+  "name": "Shivneri Junction (fictional)",
+  "min_gap": 5,
+  "max_hold": 45,
+  "platforms": [
+    {
+      "id": "P1",
+      "name": "PF 1",
+      "length_coaches": 26,
+      "use": "main line · long-distance",
+      "aliases": [
+        "1",
+        "pf1",
+        "pf 1",
+        "pf-1",
+        "platform 1",
+        "platform no. 1",
+        "platform one",
+        "प्लेटफॉर्म 1",
+        "प्लेटफॉर्म नंबर 1",
+        "प्लॅटफॉर्म 1",
+        "फलाट 1",
+        "पीएफ 1"
+      ],
+      "goods_loop_wagons": 0
+    },
+    {
+      "id": "P2",
+      "name": "PF 2",
+      "length_coaches": 26,
+      "use": "main line · long-distance",
+      "aliases": [
+        "2",
+        "pf2",
+        "pf 2",
+        "pf-2",
+        "platform 2",
+        "platform no. 2",
+        "platform two",
+        "प्लेटफॉर्म 2",
+        "प्लेटफॉर्म नंबर 2",
+        "प्लॅटफॉर्म 2",
+        "फलाट 2",
+        "पीएफ 2"
+      ],
+      "goods_loop_wagons": 0
+    },
+    {
+      "id": "P3",
+      "name": "PF 3",
+      "length_coaches": 24,
+      "use": "main line",
+      "aliases": [
+        "3",
+        "pf3",
+        "pf 3",
+        "pf-3",
+        "platform 3",
+        "platform no. 3",
+        "platform three",
+        "प्लेटफॉर्म 3",
+        "प्लेटफॉर्म नंबर 3",
+        "प्लॅटफॉर्म 3",
+        "फलाट 3",
+        "पीएफ 3"
+      ],
+      "goods_loop_wagons": 0
+    },
+    {
+      "id": "P4",
+      "name": "PF 4",
+      "length_coaches": 24,
+      "use": "main line + goods loop",
+      "aliases": [
+        "4",
+        "pf4",
+        "pf 4",
+        "pf-4",
+        "platform 4",
+        "platform no. 4",
+        "platform four",
+        "प्लेटफॉर्म 4",
+        "प्लेटफॉर्म नंबर 4",
+        "प्लॅटफॉर्म 4",
+        "फलाट 4",
+        "पीएफ 4"
+      ],
+      "goods_loop_wagons": 60
+    },
+    {
+      "id": "P5",
+      "name": "PF 5",
+      "length_coaches": 12,
+      "use": "bay · MEMU only",
+      "aliases": [
+        "5",
+        "pf5",
+        "pf 5",
+        "pf-5",
+        "platform 5",
+        "platform no. 5",
+        "platform five",
+        "प्लेटफॉर्म 5",
+        "प्लेटफॉर्म नंबर 5",
+        "प्लॅटफॉर्म 5",
+        "फलाट 5",
+        "पीएफ 5"
+      ],
+      "goods_loop_wagons": 0
+    }
+  ],
+  "capacity_rule": "Passenger types fit a PF when coaches <= length_coaches; goods fit when wagons <= goods_loop_wagons. Coaches and wagons are never compared."
+}

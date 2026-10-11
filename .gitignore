@@ -1,0 +1,29 @@
+# secrets — never commit
+.env
+.env.*
+!.env.example
+
+# runtime data
+data/railflow.db
+data/railflow.db-*
+data/backups/
+logs/
+
+# python
+.venv/
+**/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.hypothesis/
+
+# node / web
+node_modules/
+web/dist/
+*.tsbuildinfo
+
+# editors / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

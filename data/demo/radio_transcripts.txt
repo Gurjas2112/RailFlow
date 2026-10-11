@@ -1,0 +1,12 @@
+# RailFlow demo radio reports — fictional. Exactly what each clip says.
+# Use for tools/check_radio.py and as two extra rows in data/parser_eval.jsonl.
+
+radio_s2_en.wav (synthetic voice, VHF-style filter)
+Shivneri control, section controller here. Train 11209, Shivneri Fort Express, running 30 minutes late. Platform 3 shut, 14:00 to 15:30, for track inspection. Over.
+Spoken as: "train one one two zero nine ... thirty minutes ... platform three ... fourteen hundred to fifteen thirty"
+Expected events: arrival delay 11209 +30 min · closure PF 3 (P3) 14:00–15:30
+
+radio_s2_hi.wav (synthetic voice, VHF-style filter)
+शिवनेरी कंट्रोल, गाड़ी संख्या 11209 तीस मिनट देरी से चल रही है। प्लेटफॉर्म 3 दो बजे से साढ़े तीन बजे तक बंद। ओवर।
+Spoken as: "गाड़ी संख्या एक एक दो शून्य नौ ... तीस मिनट ... प्लेटफॉर्म तीन ... दो बजे से साढ़े तीन बजे तक"
+Expected events: arrival delay 11209 +30 min · closure PF 3 (P3) 14:00–15:30
