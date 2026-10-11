@@ -1,0 +1,82 @@
+[
+  {
+    "id": "S1",
+    "name": "Normal day — assign platforms",
+    "timetable_file": "timetable_normal.json",
+    "now": 720,
+    "expect": "VALID · FULLY ASSIGNED · 0 changes",
+    "proves": "Conflict-free assignment, required platforms honoured"
+  },
+  {
+    "id": "S2",
+    "name": "Radio report — delay + closure",
+    "timetable_file": "timetable_normal.json",
+    "now": 830,
+    "text": "11209 running 30 min late, platform 3 shut 14:00 to 15:30 for track inspection",
+    "expect": "Affected 3 of 30 · 3 moves · hold 16 · weighted 45 · all revisions agree",
+    "proves": "Transcribe → parse → confirm → revisions → explain → apply"
+  },
+  {
+    "id": "S2-late",
+    "name": "Same report at 14:05 (negative)",
+    "timetable_file": "timetable_normal.json",
+    "now": 845,
+    "text": "11209 running 30 min late, platform 3 shut 14:00 to 15:30 for track inspection",
+    "expect": "Delay rejected: 11209 is already at PF 3",
+    "proves": "An arrival delay for a train already at its platform is rejected"
+  },
+  {
+    "id": "S3",
+    "name": "Spreadsheet conflicts",
+    "timetable_file": "timetable_conflicts.json",
+    "now": 720,
+    "expect": "GAP P1 11214↔11216 2 · GAP P2 51218↔51219 3 · OVERLAP P4 51214↔51215 5/10",
+    "proves": "Detection by train and platform with minutes, matching the workbook's Answer key"
+  },
+  {
+    "id": "S4",
+    "name": "Unknown train",
+    "timetable_file": "timetable_normal.json",
+    "now": 720,
+    "text": "11299 delayed 20 min",
+    "expect": "Rejected: 11299 is not in today's timetable",
+    "proves": "Unknown train rejected, not guessed"
+  },
+  {
+    "id": "S5",
+    "name": "S8 + planner fault",
+    "timetable_file": "timetable_normal.json",
+    "now": 850,
+    "text": "51218 held at platform 2, departure 25 min late. Platform 3 closed 14:30 to 15:10 for a points check",
+    "inject_fault": true,
+    "expect": "A: OVERLAP P1 12222↔51215 · stays 7 · reserved 12 → NOT VALID",
+    "proves": "Independent validator rejects; Apply disabled"
+  },
+  {
+    "id": "S6",
+    "name": "Peak + two platforms closed",
+    "timetable_file": "timetable_peak.json",
+    "now": 840,
+    "text": "Platform 2 closed 15:00 to 16:30. Platform 4 closed 15:00 to 16:30",
+    "expect": "Some trains UNASSIGNED with reasons · plan still VALID (PARTIAL)",
+    "proves": "UNASSIGNED with reasons; plan still valid"
+  },
+  {
+    "id": "S7",
+    "name": "Ollama stopped",
+    "timetable_file": "timetable_normal.json",
+    "now": 830,
+    "text": "11209 running 30 min late, platform 3 shut 14:00 to 15:30 for track inspection",
+    "expect": "parser: regex · explainer: template · same plan as S2",
+    "proves": "Regex parser + template explainer; path chips flip"
+  },
+  {
+    "id": "S8",
+    "name": "Delay cascade",
+    "timetable_file": "timetable_normal.json",
+    "now": 850,
+    "text": "51218 held at platform 2, departure 25 min late. Platform 3 closed 14:30 to 15:10 for a points check",
+    "expect": "Affected 4 of 30 · A 2 moves / weighted 76 · B 1 move / weighted 136",
+    "proves": "Affected 4 of 30; real trade-off A vs B; chain 51218 → 51215"
+  }
+]
