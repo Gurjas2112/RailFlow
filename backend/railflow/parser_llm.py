@@ -21,7 +21,11 @@ Copy train numbers exactly as written. Copy platform references exactly as writt
 "source" must be an exact substring of the message.
 Put any sentence that is not a delay or closure into "unparsed".
 If a time or number is ambiguous, still extract it and set "ambiguous": true.
-The message may be in English, Hindi, Marathi or a mix. Train numbers and times may use Devanagari digits; copy them exactly."""
+The message may be in English, Hindi, Marathi or a mix. Train numbers and times may use Devanagari digits; copy them exactly.
+The user turn is ONLY the operator's message. Each "source" is copied character for character from it.
+
+Example message: 12201 is 15 min late. PF 2 blocked 13:00-13:40 for cleaning
+Example output: {"events": [{"type": "delay", "train_id": "12201", "minutes": 15, "kind": "arrival", "source": "12201 is 15 min late"}, {"type": "closure", "platform": "PF 2", "start": "13:00", "end": "13:40", "source": "PF 2 blocked 13:00-13:40"}], "unparsed": ["for cleaning"]}"""
 
 SCHEMA = {
     "type": "object",
@@ -61,9 +65,11 @@ def _schema_ok(obj: Any) -> bool:
 
 
 def call_llm(text: str, platforms: list[str], trains: list[str]) -> Optional[dict[str, Any]]:
-    user = (f"Platforms at this station: {', '.join(platforms)}.\n"
-            f"Train numbers in today's timetable: {', '.join(trains)}.\n\nMessage:\n{text}")
-    raw = llm.chat(SYSTEM_PROMPT, user, SCHEMA)
+    system = SYSTEM_PROMPT
+    if platforms or trains:
+        system += (f"\nPlatforms at this station: {', '.join(platforms)}. "
+                   f"Train numbers in today's timetable: {', '.join(trains)}.")
+    raw = llm.chat(system, text, SCHEMA)
     if raw is None:
         return None
     try:
@@ -87,3 +93,9 @@ def parse(text: str, normalised_text: str, platforms: list[str], trains: list[st
 def parse_llm(text: str) -> tuple[dict[str, Any], str, int]:
     """Back-compatible single-argument entry point."""
     return parse(text, text, [], [])
+
+
+def warm_up() -> None:
+    """One dummy parse so the first operator message is not slowed by model loading (§25)."""
+    if llm.resolve_model():
+        llm.chat(SYSTEM_PROMPT, "12201 running 5 min late", SCHEMA, timeout=120)

@@ -104,3 +104,20 @@ def test_minutes_out_of_range(station, tt_normal):
 def test_noise_goes_to_unparsed():
     r = parse_regex("Inspection team to report at control at 16:00")
     assert r["events"] == [] and r["unparsed"]
+
+
+def test_llm_numbers_cross_checked_against_their_own_source(station, tt_normal):
+    """A parser that copies the right words but reports other numbers is caught deterministically."""
+    text = "Platform 3 closed 14:30 to 15:10 for a points check. 11209 running 30 min late"
+    ev = [{"type": "closure", "platform": "P2", "start": "14:30", "end": "15:10", "source": "Platform 3 closed 14:30 to 15:10"},
+          {"type": "delay", "train_id": "11209", "minutes": 20, "kind": "arrival", "source": "11209 running 30 min late"}]
+    ok, rej, _ = validate_proposals(ev, [], text, station, tt_normal, 0)
+    assert not rej and [p.status for p in ok] == ["needs_clarification", "needs_clarification"]
+    assert {p.reason.code for p in ok} == {"INCONSISTENT"}
+
+
+def test_departure_kind_needs_departure_words(station, tt_normal):
+    text = "गाड़ी संख्या 11209 तीस मिनट देरी से चल रही है"
+    ev = [{"type": "delay", "train_id": "11209", "minutes": 30, "kind": "departure", "source": text}]
+    ok, _, _ = validate_proposals(ev, [], text, station, tt_normal, 0)
+    assert ok[0].status == "needs_clarification"

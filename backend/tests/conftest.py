@@ -16,6 +16,7 @@ os.environ.setdefault("RAILFLOW_VIEWER_PASSWORD", PASSWORDS["viewer"])
 os.environ.setdefault("RAILFLOW_CONTROLLER_PASSWORD", PASSWORDS["controller"])
 os.environ.setdefault("RAILFLOW_ADMIN_PASSWORD", PASSWORDS["admin"])
 os.environ["RAILFLOW_OLLAMA_URL"] = "http://127.0.0.1:9"      # tests never depend on a running Ollama
+os.environ["RAILFLOW_WARMUP"] = "0"
 
 
 def load_json(name: str):

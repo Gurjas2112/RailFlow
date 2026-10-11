@@ -1,0 +1,29 @@
+/* web/src/design/tokens.css — SPEC §13. Chrome is cool neutral; colour is reserved for train state. */
+:root {
+  /* chrome — cool neutrals */
+  --rf-void:      #0B0F14;   /* app background, 3D clear colour */
+  --rf-panel:     #141A21;
+  --rf-raised:    #1A222B;
+  --rf-line:      #263038;
+  --rf-muted:     #7C8B98;
+  --rf-text:      #E6EDF2;
+  --rf-signal:    #0E9AA7;   /* the ONLY interactive accent: buttons, focus, links */
+
+  /* train and platform state — meaning only */
+  --st-ontime:    #2BB673;   /* on time / unchanged */
+  --st-delayed:   #F2A33A;   /* reported delay */
+  --st-held:      #F27C38;   /* planner hold */
+  --st-moved:     #5AA9FF;   /* platform changed */
+  --st-unassigned:#9AA4AE;   /* could not be placed */
+  --st-conflict:  #E5484D;   /* validator conflict — and nothing else */
+  --st-closed:    #E5484D;   /* closure, always rendered hatched, never solid */
+  --st-frozen:    #3A4652;   /* departed / at platform at "now" */
+
+  /* verdict badge */
+  --vd-valid:     #2BB673;
+  --vd-invalid:   #E5484D;
+
+  --font-ui: "Noto Sans", "Noto Sans Devanagari", system-ui, sans-serif;
+  --font-deva: "Noto Sans Devanagari", "Noto Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}

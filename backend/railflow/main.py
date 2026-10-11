@@ -52,6 +52,10 @@ async def lifespan(_app: FastAPI):
     status = db.startup()
     if status == "ok" and not store.ready():
         store.load_builtin("S1", loaded_by="system")
+    if config.env("RAILFLOW_WARMUP", "1") == "1":            # first parse not slowed by model loading (§25)
+        import threading
+        from .parser_llm import warm_up
+        threading.Thread(target=warm_up, daemon=True).start()
     yield
 
 

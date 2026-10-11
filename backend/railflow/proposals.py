@@ -18,7 +18,7 @@ from .timeutil import parse_loose_time, to_hhmm, to_min
 
 _DEV_DIGITS = str.maketrans("०१२३४५६७८९", "0123456789")
 PROPOSAL_CODES = ["SOURCE_NOT_FOUND", "UNKNOWN_TRAIN", "UNKNOWN_PLATFORM", "MINUTES_OUT_OF_RANGE",
-                  "BAD_TIME", "CLOSURE_ORDER", "ALREADY_DEPARTED", "AT_PLATFORM", "AMBIGUOUS"]
+                  "BAD_TIME", "CLOSURE_ORDER", "ALREADY_DEPARTED", "AT_PLATFORM", "AMBIGUOUS", "INCONSISTENT"]
 
 
 # ─────────────────────────── normalisation with an index map ───────────────────────────
@@ -182,7 +182,39 @@ def validate_proposals(
     return ok, rejected, [u for u in unparsed if u and u.strip()]
 
 
+_DEP_WORDS = re.compile(r"depart|leav|held at|late departure|प्रस्थान|रवाना|सुटण|सुटेल|निघ", re.I)
+_PF_IN_SRC = re.compile(r"(?:platform|\bpf|\bp|प्लेटफॉर्म|प्लॅटफॉर्म|फलाट|पीएफ)\s*(?:no\.?|नंबर)?\s*-?\s*(\d{1,2})\b", re.I)
+
+
+def inconsistency(p: Proposal) -> Optional[str]:
+    """Deterministic cross-check of a proposal against its own source span. Catches a parser (LLM or regex)
+    that copies the right words but reports different numbers. None if consistent or not checkable."""
+    src = normalise(p.source or "").text
+    nums = re.findall(r"(?<![\d:])\d{1,3}(?![\d:])", src)
+    if p.type == "delay":
+        if p.minutes is not None and str(p.minutes) not in nums:                 # e.g. "तीस मिनट", "half an hour"
+            return f"{p.minutes} min is not written in “{p.source}”"
+        if p.kind == "departure" and not _DEP_WORDS.search(src):
+            return f"“{p.source}” does not describe a departure delay"
+    else:
+        pfs = {f"P{int(m)}" for m in _PF_IN_SRC.findall(src)}
+        if pfs and p.platform_id not in pfs:
+            return f"platform {p.platform_id} does not match “{p.source}”"
+        times = {to_hhmm(t) for t in (parse_loose_time(x) for x in re.findall(r"\d{1,2}:\d{2}", src)) if t is not None}
+        if not {p.start, p.end} <= times:                                        # e.g. "दो बजे", "2 baje"
+            return f"{p.start}–{p.end} is not written in “{p.source}”"
+    return None
+
+
+
+
 def _accept(p: Proposal, ok: list[Proposal]) -> None:
+    why = inconsistency(p)
+    if why:
+        p.status, p.message = "needs_clarification", f"Check before confirming: {why}"
+        p.reason = ReasonPart(code="INCONSISTENT", params={"detail": why})
+        ok.append(p)
+        return
     if p.ambiguous:
         p.status, p.message = "needs_clarification", "Ambiguous — check and edit before confirming"
         p.reason = ReasonPart(code="AMBIGUOUS")

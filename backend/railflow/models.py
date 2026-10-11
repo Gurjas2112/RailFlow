@@ -17,6 +17,11 @@ PLATFORM_ID = r"^P\d{1,2}$"
 TrainType = Literal["SF", "MEX", "PAS", "MEMU", "GDS"]
 Lang = Literal["en", "hi", "mr"]
 
+class Base(BaseModel):
+    """Responses always carry every field, so the OpenAPI output schema marks defaulted fields required."""
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
+
 VALIDATOR_RULES = ["V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10"]
 RULE_OF = {
     "MISSING_TRAIN": "V1", "DUPLICATE_TRAIN": "V1", "UNKNOWN_TRAIN": "V1",
@@ -35,7 +40,7 @@ RULE_OF = {
 
 # ───────────────────────────── station ─────────────────────────────
 
-class Platform(BaseModel):
+class Platform(Base):
     id: str = Field(pattern=PLATFORM_ID)
     name: str = Field(max_length=40)
     length_coaches: int = Field(ge=0, le=60)
@@ -44,7 +49,7 @@ class Platform(BaseModel):
     goods_loop_wagons: int = Field(default=0, ge=0, le=200)
 
 
-class Station(BaseModel):
+class Station(Base):
     id: str = Field(min_length=2, max_length=8)
     code: str = Field(default="", max_length=8)
     name: str = Field(max_length=80)
@@ -78,7 +83,7 @@ class Station(BaseModel):
 
 # ───────────────────────────── timetable ─────────────────────────────
 
-class Train(BaseModel):
+class Train(Base):
     """Internal train: times in minutes."""
     id: str = Field(pattern=TRAIN_ID)
     name: str = ""
@@ -101,7 +106,7 @@ class Train(BaseModel):
         return self.dep - self.arr
 
 
-class Timetable(BaseModel):
+class Timetable(Base):
     station: str = "SVNJ"
     day: str = "Sun"
     trains: list[Train]
@@ -110,9 +115,9 @@ class Timetable(BaseModel):
         return {t.id: t for t in self.trains}
 
 
-class TrainIn(BaseModel):
+class TrainIn(Base):
     """Edge model (SPEC §32 layer 2): HH:MM strings, IR working-timetable fields."""
-    model_config = ConfigDict(extra="ignore")
+    model_config = ConfigDict(extra="ignore", json_schema_serialization_defaults_required=True)
     id: str = Field(pattern=TRAIN_ID)
     name: str = Field(max_length=60)
     type: TrainType
@@ -160,8 +165,8 @@ class TrainIn(BaseModel):
         return Train(**d)
 
 
-class TimetableIn(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+class TimetableIn(Base):
+    model_config = ConfigDict(extra="ignore", json_schema_serialization_defaults_required=True)
     station: str = "SVNJ"
     day: str = "Sun"
     trains: list[TrainIn] = Field(min_length=1, max_length=200)
@@ -209,14 +214,14 @@ def referential_errors(station: Station, tt: Timetable | TimetableIn) -> list[st
 
 # ───────────────────────────── disruptions ─────────────────────────────
 
-class Delay(BaseModel):
+class Delay(Base):
     train_id: str = Field(pattern=TRAIN_ID)
     minutes: int = Field(ge=1, le=600)
     kind: Literal["arrival", "departure"] = "arrival"
     source_span: Optional[str] = Field(default=None, max_length=1000)
 
 
-class Closure(BaseModel):
+class Closure(Base):
     platform_id: str = Field(pattern=PLATFORM_ID)
     start: int = Field(ge=0, le=1439)
     end: int = Field(ge=1, le=1440)
@@ -229,7 +234,7 @@ class Closure(BaseModel):
         return self
 
 
-class Disruptions(BaseModel):
+class Disruptions(Base):
     delays: list[Delay] = Field(default_factory=list)
     closures: list[Closure] = Field(default_factory=list)
 
@@ -242,7 +247,7 @@ class Disruptions(BaseModel):
         return out
 
 
-class DelayIn(BaseModel):
+class DelayIn(Base):
     """Confirmed delay as sent by the browser after the human gate."""
     type: Literal["delay"] = "delay"
     train_id: str = Field(pattern=TRAIN_ID)
@@ -251,7 +256,7 @@ class DelayIn(BaseModel):
     source: Optional[str] = Field(default=None, max_length=1000)
 
 
-class ClosureIn(BaseModel):
+class ClosureIn(Base):
     type: Literal["closure"] = "closure"
     platform_id: str = Field(pattern=PLATFORM_ID)
     start: str = Field(pattern=HHMM)
@@ -281,7 +286,7 @@ def disruptions_from_in(items: list[DelayIn | ClosureIn]) -> Disruptions:
 
 # ───────────────────────────── plans and verdicts ─────────────────────────────
 
-class Assignment(BaseModel):
+class Assignment(Base):
     train_id: str
     status: Literal["ASSIGNED", "UNASSIGNED"]
     platform: Optional[str] = None
@@ -299,7 +304,7 @@ class Assignment(BaseModel):
         return cls(train_id=tid, status="UNASSIGNED", reason_code=reason_code)
 
 
-class Conflict(BaseModel):
+class Conflict(Base):
     code: str
     trains: list[str]
     platform: Optional[str] = None
@@ -318,14 +323,14 @@ class Conflict(BaseModel):
         return self
 
 
-class ValidationReport(BaseModel):
+class ValidationReport(Base):
     valid: bool
     conflicts: list[Conflict] = Field(default_factory=list)
     checked_rules: list[str] = Field(default_factory=lambda: list(VALIDATOR_RULES))
     validator_version: str = ""
 
 
-class Revision(BaseModel):
+class Revision(Base):
     """A planner output. Never trusted until validated."""
     id: str = ""
     method: str
@@ -357,7 +362,7 @@ def recovery_status(rev: Revision) -> str:
     return "PARTIAL" if rev.unassigned_count() else "FULLY_ASSIGNED"
 
 
-class PlanInput(BaseModel):
+class PlanInput(Base):
     station: Station
     timetable: Timetable
     applied: Optional[list[Assignment]] = None        # None → the scheduled platforms are the applied plan
@@ -388,18 +393,18 @@ class PlanInput(BaseModel):
 
 # ───────────────────────────── API shapes ─────────────────────────────
 
-class ReasonPart(BaseModel):
+class ReasonPart(Base):
     code: str
     params: dict[str, Any] = Field(default_factory=dict)
 
 
-class Slot(BaseModel):
+class Slot(Base):
     platform: Optional[str] = None
     arr: Optional[int] = None
     dep: Optional[int] = None
 
 
-class ChangeItem(BaseModel):
+class ChangeItem(Base):
     train_id: str
     cls: str                                          # FROZEN · UNCHANGED · DELAYED · HELD · MOVED · MOVED_HELD · UNASSIGNED
     before: Optional[Slot] = None
@@ -411,7 +416,7 @@ class ChangeItem(BaseModel):
     affected: bool = False
 
 
-class Metrics(BaseModel):
+class Metrics(Base):
     total_hold_min: int = 0
     weighted_delay: int = 0
     platform_changes: int = 0
@@ -422,7 +427,7 @@ class Metrics(BaseModel):
     moved_outside_affected: int = 0
 
 
-class RevisionOut(BaseModel):
+class RevisionOut(Base):
     revision: Revision
     validation: ValidationReport
     recovery: str
@@ -432,7 +437,7 @@ class RevisionOut(BaseModel):
     sha256: str = ""
 
 
-class PlanResponse(BaseModel):
+class PlanResponse(Base):
     revisions: list[RevisionOut]
     affected: list[str] = Field(default_factory=list)
     now: int = 0
@@ -442,7 +447,7 @@ class PlanResponse(BaseModel):
     widened: bool = False
 
 
-class Proposal(BaseModel):
+class Proposal(Base):
     id: str
     type: Literal["delay", "closure"]
     status: Literal["ok", "needs_clarification", "rejected"] = "ok"
@@ -461,12 +466,12 @@ class Proposal(BaseModel):
     message: Optional[str] = None
 
 
-class ParseRequest(BaseModel):
+class ParseRequest(Base):
     text: str = Field(min_length=1, max_length=1000)
     now: Optional[str] = Field(default=None, pattern=HHMM)
 
 
-class ParseResponse(BaseModel):
+class ParseResponse(Base):
     proposals: list[Proposal]
     rejected: list[Proposal]
     unparsed: list[str]
@@ -474,7 +479,7 @@ class ParseResponse(BaseModel):
     ms: int = 0
 
 
-class PlanRequest(BaseModel):
+class PlanRequest(Base):
     confirmed: list[Disruption] = Field(default_factory=list, max_length=20)
     now: str = Field(pattern=HHMM)
     inject_fault: bool = False
@@ -482,30 +487,30 @@ class PlanRequest(BaseModel):
     parser_path: Literal["llm", "regex", "manual"] = "manual"
 
 
-class AssignRequest(BaseModel):
+class AssignRequest(Base):
     now: Optional[str] = Field(default=None, pattern=HHMM)
 
 
-class ExplainRequest(BaseModel):
+class ExplainRequest(Base):
     revision_ids: list[str] = Field(min_length=1, max_length=3)
     lang: Lang = "en"
 
 
-class ExplainResponse(BaseModel):
+class ExplainResponse(Base):
     text: str
     explainer_path: Literal["llm", "template"]
     grounding: str
     parts: list[ReasonPart] = Field(default_factory=list)
 
 
-class ScenarioLoadRequest(BaseModel):
+class ScenarioLoadRequest(Base):
     scenario_id: Optional[str] = Field(default=None, max_length=40)
     station: Optional[dict[str, Any]] = None
     timetable: Optional[dict[str, Any]] = None
     source: Optional[str] = Field(default=None, max_length=200)
 
 
-class ScenarioInfo(BaseModel):
+class ScenarioInfo(Base):
     id: str
     name: str
     timetable_file: str
@@ -516,7 +521,7 @@ class ScenarioInfo(BaseModel):
     proves: str = ""
 
 
-class ScenarioState(BaseModel):
+class ScenarioState(Base):
     """Everything the browser renders: the station, the trains, the applied plan and its verdict."""
     scenario_id: str
     source: str
@@ -531,7 +536,7 @@ class ScenarioState(BaseModel):
     now: int
 
 
-class UploadResponse(BaseModel):
+class UploadResponse(Base):
     timetable: Optional[dict[str, Any]] = None
     station: Optional[dict[str, Any]] = None
     needs_sheet: Optional[list[str]] = None
@@ -541,39 +546,39 @@ class UploadResponse(BaseModel):
     sheet: Optional[str] = None
 
 
-class TranscribeResponse(BaseModel):
+class TranscribeResponse(Base):
     transcript: str
     stt_path: Literal["whisper-small", "unavailable"]
     ms: int = 0
     error: Optional[str] = None
 
 
-class LoginRequest(BaseModel):
+class LoginRequest(Base):
     username: str = Field(min_length=1, max_length=64)
     password: str = Field(min_length=1, max_length=256)
 
 
-class SessionOut(BaseModel):
+class SessionOut(Base):
     user: str
     role: Literal["viewer", "controller", "admin"]
     lang: Lang = "en"
 
 
-class LangRequest(BaseModel):
+class LangRequest(Base):
     lang: Lang
 
 
-class AcceptInviteRequest(BaseModel):
+class AcceptInviteRequest(Base):
     token: str = Field(min_length=10, max_length=200)
     password: str = Field(min_length=1, max_length=256)
 
 
-class InviteRequest(BaseModel):
+class InviteRequest(Base):
     username: str = Field(pattern=r"^[a-z0-9_.-]{3,32}$")
     role: Literal["viewer", "controller", "admin"] = "viewer"
 
 
-class InviteOut(BaseModel):
+class InviteOut(Base):
     username: str
     role: str
     token: str
@@ -581,12 +586,12 @@ class InviteOut(BaseModel):
     expires_in_s: int = 86400
 
 
-class UserPatch(BaseModel):
+class UserPatch(Base):
     role: Optional[Literal["viewer", "controller", "admin"]] = None
     disabled: Optional[bool] = None
 
 
-class UserOut(BaseModel):
+class UserOut(Base):
     id: int
     username: str
     role: str
@@ -594,13 +599,13 @@ class UserOut(BaseModel):
     lang: str = "en"
 
 
-class AuditVerify(BaseModel):
+class AuditVerify(Base):
     intact: bool
     entries: int
     first_broken_seq: Optional[int] = None
 
 
-class Health(BaseModel):
+class Health(Base):
     ok: bool
     ollama: Literal["up", "down"]
     model: str

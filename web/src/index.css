@@ -1,0 +1,84 @@
+@import "tailwindcss";
+@import "./design/tokens.css";
+
+@import "@fontsource/noto-sans/400.css";
+@import "@fontsource/noto-sans/600.css";
+@import "@fontsource/noto-sans-devanagari/400.css";
+@import "@fontsource/noto-sans-devanagari/600.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/600.css";
+
+@theme {
+  --color-void: var(--rf-void);
+  --color-panel: var(--rf-panel);
+  --color-raised: var(--rf-raised);
+  --color-line: var(--rf-line);
+  --color-muted: var(--rf-muted);
+  --color-ink: var(--rf-text);
+  --color-signal: var(--rf-signal);
+  --color-ontime: var(--st-ontime);
+  --color-delayed: var(--st-delayed);
+  --color-held: var(--st-held);
+  --color-moved: var(--st-moved);
+  --color-unassigned: var(--st-unassigned);
+  --color-conflict: var(--st-conflict);
+  --color-closed: var(--st-closed);
+  --color-frozen: var(--st-frozen);
+  --color-valid: var(--vd-valid);
+  --color-invalid: var(--vd-invalid);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-mono);
+}
+
+html, body, #root { height: 100%; }
+html { background: var(--rf-void); color: var(--rf-text); color-scheme: dark; }
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+html[lang="hi"] body, html[lang="mr"] body { font-family: var(--font-deva); font-size: 16px; line-height: 1.6; }
+
+/* every time, train ID and minute value: mono, tabular */
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+
+:focus-visible { outline: 2px solid var(--rf-signal); outline-offset: 2px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  min-height: 44px; padding: 0 .9rem; border-radius: .5rem; font-weight: 600;
+  background: var(--rf-signal); color: #031417; border: 1px solid transparent; cursor: pointer;
+  white-space: nowrap;
+}
+.btn:disabled { background: var(--rf-line); color: var(--rf-muted); cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--rf-text); border-color: var(--rf-line); }
+.btn-ghost:hover:not(:disabled) { border-color: var(--rf-signal); }
+.btn-sm { min-height: 36px; padding: 0 .6rem; font-size: .875rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: .3rem; padding: .1rem .5rem; border-radius: 999px;
+  font-size: .78rem; border: 1px solid var(--rf-line); color: var(--rf-muted); white-space: nowrap;
+}
+.panel { background: var(--rf-panel); border: 1px solid var(--rf-line); border-radius: .75rem; }
+.field {
+  width: 100%; background: var(--rf-void); color: var(--rf-text); border: 1px solid var(--rf-line);
+  border-radius: .5rem; padding: .55rem .7rem; min-height: 44px; font: inherit;
+}
+.field:focus { border-color: var(--rf-signal); outline: none; }
+.label { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--rf-muted); font-weight: 600; }
+html[lang="hi"] .label, html[lang="mr"] .label { text-transform: none; letter-spacing: 0; }
+
+/* closures are always hatched, conflicts always solid (§13) */
+.hatch-closed {
+  background-image: repeating-linear-gradient(135deg, var(--st-closed) 0 3px, transparent 3px 8px);
+  border: 1px solid var(--st-closed);
+}
+.mark { background: color-mix(in srgb, var(--rf-signal) 30%, transparent); color: var(--rf-text); border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+@keyframes rf-pulse { 50% { opacity: .45; } }
+.pulse { animation: rf-pulse 1.2s ease-in-out infinite; }
