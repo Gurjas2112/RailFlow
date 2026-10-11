@@ -174,7 +174,7 @@ export default function TimetableEditor() {
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setDraft(blank()); setErrors([]); }}>{t("editor.blank")}</button>
           </div>
 
-          <fieldset className="space-y-2">
+          <fieldset className="min-w-0 space-y-2">
             <legend className="label">{t("editor.station")}</legend>
             <div className="grid grid-cols-2 gap-2">
               <label className="text-xs">{t("editor.stationName")}
@@ -187,7 +187,7 @@ export default function TimetableEditor() {
                 <input className="field num mt-1 w-full" inputMode="numeric" value={d.maxHold} onChange={(e) => patch({ maxHold: e.target.value })} /></label>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="min-w-max text-sm">
                 <thead><tr className="text-left text-xs text-muted">
                   <th className="pr-1">{t("field.platform")}</th><th className="pr-1">{t("editor.length")}</th>
                   <th className="pr-1">{t("editor.loop")}</th><th className="pr-1">{t("editor.use")}</th><th />
@@ -216,10 +216,10 @@ export default function TimetableEditor() {
             <p className="text-xs text-muted">{t("editor.useHelp")}</p>
           </fieldset>
 
-          <fieldset className="space-y-2">
+          <fieldset className="min-w-0 space-y-2">
             <legend className="label">{t("editor.trains", { count: d.trains.length })}</legend>
             <div className="max-h-96 overflow-auto">
-              <table className="text-sm">
+              <table className="min-w-max text-sm">
                 <thead className="sticky top-0 bg-raised"><tr className="text-left text-xs text-muted">
                   {["field.train", "editor.name", "editor.type", "editor.from", "editor.to", "editor.dir", "editor.arr", "editor.dep",
                     "editor.schPf", "editor.reqPf", "editor.allowed", "editor.stock", "editor.priority"].map((k) => (
