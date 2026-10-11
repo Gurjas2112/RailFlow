@@ -13,6 +13,19 @@ simulator with independently verified scheduling outcomes. VORTEXA 3.0 · P-03. 
 
 Full engineering specification: [`docs/SPEC.md`](docs/SPEC.md). Agent instructions and definition of done: [`AGENTS.md`](AGENTS.md).
 
+## Repository map
+
+| Folder | What is in it |
+|---|---|
+| [`backend/railflow/`](backend/railflow/) | FastAPI app: planner (CP-SAT + greedy), independent validator, AI parser/explainer, auth, audit, storage |
+| [`backend/tests/`](backend/tests/) | pytest suite, one file per SPEC §20 area |
+| [`web/`](web/) | React 19 + Vite UI: Gantt, 3D/2D station, disruption and compare panels, admin dashboard, EN/हिं/मर |
+| [`data/`](data/) | Fictional Shivneri Junction station, timetables, scenarios, demo workbook and radio clips |
+| [`tools/`](tools/) | Data generation, benchmark, parser evaluation; `tools/reference/` is the independent oracle |
+| [`results/`](results/) | Measured benchmark and parser-evaluation reports |
+| [`docs/`](docs/) | Engineering spec, judge audit, hackathon report (DOCX + PDF) |
+| [`app_screenshots_&_screen_recordings/`](app_screenshots_&_screen_recordings/) | Flow-by-flow screenshots and the full demo recording |
+
 ## Setup (once)
 
 Requirements: Python 3.12, Node 20.19+ (or 22.12+), and optionally [Ollama](https://ollama.com) with `qwen2.5:3b` (or `qwen2.5:3b-instruct`).

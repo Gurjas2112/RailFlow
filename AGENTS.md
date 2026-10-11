@@ -1,6 +1,6 @@
 # AGENTS.md — RailFlow coding-agent instructions (v1.7, reconstructed)
 
-> **Provenance.** The original v1.7 `AGENTS.md` listed in `BUNDLE_README.md` was not present in the bundle.
+> **Provenance.** The original v1.7 `AGENTS.md` from the design bundle was not available.
 > This file was reconstructed from `docs/SPEC.md` v1.7 (§1, §17–§20, §28, §30–§33, §47–§48). Where this file and
 > the spec disagree, **the spec wins**.
 
