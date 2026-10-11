@@ -8,6 +8,9 @@
 - Time cells: Excel time, Excel datetime (time part) or HH:MM text; anything else is a row error
 - Allowed PFs: comma/space list of PF numbers; blank → derived from length (coaches) or goods loop (wagons) and use
 - Errors are returned per row and column and nothing is imported until every row passes
+- Your own station (§17 load `{station, timetable}`): the "Station" sheet's platform table (PF · Length (coaches) ·
+  Goods loop (wagons) · Use · Names) or a .json `{"station": …, "timetable": …}`. A table identical to the loaded
+  station keeps it as is; platforms without names get the standard EN · हिं · मर aliases so the parser resolves them
 """
 from __future__ import annotations
 
@@ -21,7 +24,7 @@ from typing import Any, Optional
 
 from pydantic import ValidationError
 
-from .models import Station, TimetableIn, TrainIn, referential_errors
+from .models import Platform, Station, TimetableIn, TrainIn, referential_errors
 
 MAX_BYTES, MAX_ROWS, MAX_COLS = 1024 * 1024, 500, 20
 REQUIRED = ["train no.", "train name", "type", "from", "to", "dir", "arr", "dep",
@@ -97,6 +100,98 @@ def derive_allowed(station: Station, typ: str, coaches: Optional[int], wagons: O
         if ok:
             out.append(p.id)
     return out
+
+
+NUM_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+             "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"]
+
+
+def default_aliases(pid: str) -> list[str]:
+    """The alias pattern of the shipped station (EN · हिं · मर), for a platform ID like P7."""
+    n = int(pid[1:])
+    out = [str(n), f"pf{n}", f"pf {n}", f"pf-{n}", f"platform {n}", f"platform no. {n}"]
+    if n < len(NUM_WORDS):
+        out.append(f"platform {NUM_WORDS[n]}")
+    return out + [f"प्लेटफॉर्म {n}", f"प्लेटफॉर्म नंबर {n}", f"प्लॅटफॉर्म {n}", f"फलाट {n}", f"पीएफ {n}"]
+
+
+def with_default_aliases(station: Station) -> Station:
+    """Platforms that list no names get the standard aliases, so a custom station parses like the shipped one."""
+    if all(p.aliases for p in station.platforms):
+        return station
+    return station.model_copy(update={"platforms": [
+        p if p.aliases else p.model_copy(update={"aliases": default_aliases(p.id)}) for p in station.platforms]})
+
+
+def _merge_aliases(*lists: list[str]) -> list[str]:
+    out, seen = [], set()
+    for a in (x for lst in lists for x in lst):
+        k = " ".join(a.lower().split())
+        if k and k not in seen:
+            seen.add(k)
+            out.append(a.strip())
+    return out[:40]
+
+
+def _station_xlsx(wb, base: Station, settings: dict[str, int]) -> tuple[Station, list[str]]:
+    """The "Station" sheet's platform table → a station; no table, or the same platforms as `base` → `base`."""
+    ws = next((w for w in wb.worksheets if w.title.strip().lower() == "station"), None)
+    if ws is None:
+        return base.model_copy(update=settings), []
+    name, code = "", ""
+    head: Optional[dict[str, int]] = None
+    plats: list[dict[str, Any]] = []
+    errors: list[str] = []
+    for n, r in enumerate(ws.iter_rows(min_row=1, max_row=60, max_col=8, values_only=True), start=1):
+        cells = list(r)
+        first = _norm(cells[0] if cells else "")
+        if head is None:
+            if n == 1 and re.match(r"^station\s*[—–-]", str(cells[0] or "").strip(), re.I):
+                name = re.split(r"[—–-]", str(cells[0]).strip(), maxsplit=1)[1].strip()
+            elif first == "station code" and len(cells) > 1:
+                code = str(cells[1] or "").strip()
+            elif first in ("pf", "platform") and any("length" in _norm(c) for c in cells):
+                head = {_norm(c): i for i, c in enumerate(cells) if c is not None}
+            continue
+        if all(c is None or str(c).strip() == "" for c in cells):
+            break                                                       # the table ends at its first blank row
+
+        hd = head
+
+        def col(*keys: str) -> Any:
+            i = next((hd[k] for k in hd if any(k.startswith(x) for x in keys)), None)
+            return cells[i] if i is not None and i < len(cells) else None
+        try:
+            pid = _pf(cells[0], f"Station sheet · row {n} · PF")
+            length = _int(col("length"), f"Station sheet · row {n} · Length (coaches)")
+            loop = _int(col("goods loop"), f"Station sheet · row {n} · Goods loop (wagons)") or 0
+        except ValueError as e:
+            errors.append(str(e))
+            continue
+        if pid is None or length is None:
+            errors.append(f"Station sheet · row {n}: PF and Length (coaches) are required")
+            continue
+        names = [x for x in str(col("names") or "").split(",") if x.strip()]
+        plats.append({"id": pid, "length_coaches": length, "goods_loop_wagons": loop,
+                      "use": str(col("use") or "").strip()[:80], "names": names})
+    if errors or not plats:
+        return base.model_copy(update=settings), errors
+    same = [(p.id, p.length_coaches, p.goods_loop_wagons, p.use) for p in base.platforms] == \
+           [(p["id"], p["length_coaches"], p["goods_loop_wagons"], p["use"]) for p in plats]
+    if same:
+        return base.model_copy(update=settings), []
+    sid = re.sub(r"[^A-Z0-9]", "", code.upper())[:8]
+    sid = sid if len(sid) >= 2 else "CUSTOM"
+    try:
+        st = Station(id=sid, code=sid, name=(name or code or "Custom station")[:80],
+                     min_gap=settings.get("min_gap", base.min_gap), max_hold=settings.get("max_hold", base.max_hold),
+                     platforms=[Platform(id=p["id"], name=f"PF {p['id'][1:]}", length_coaches=p["length_coaches"],
+                                         goods_loop_wagons=p["goods_loop_wagons"], use=p["use"],
+                                         aliases=_merge_aliases(p["names"], default_aliases(p["id"])))
+                                for p in plats])
+    except ValidationError as e:
+        return base, [f"Station sheet: {er['msg'].removeprefix('Value error, ')}" for er in e.errors()]
+    return st, []
 
 
 def _runs_on(days: str, day: str) -> bool:
@@ -183,7 +278,11 @@ def _station_settings_xlsx(wb) -> dict[str, int]:
 
 def parse_upload(filename: str, data: bytes, station: Station, sheet: Optional[str] = None,
                  day: str = "Sun") -> dict[str, Any]:
-    """→ {timetable, sha256, sheet, settings, excluded} | {needs_sheet, sha256} | {errors, sha256}."""
+    """→ {timetable, station, sha256, sheet, settings, excluded} | {needs_sheet, sha256} | {errors, sha256}.
+
+    `station` is the station the timetable was checked against: the loaded one (with any sheet settings),
+    or the workbook's / JSON file's own station.
+    """
     sha = hashlib.sha256(data).hexdigest()
     name = filename.lower().strip()
     if len(data) > MAX_BYTES:
@@ -192,14 +291,23 @@ def parse_upload(filename: str, data: bytes, station: Station, sheet: Optional[s
         return {"errors": ["Macro-enabled or legacy workbooks are refused; save as .xlsx"], "sha256": sha}
     if name.endswith(".json"):
         try:
-            tti = TimetableIn.model_validate_json(data)
+            obj = json.loads(data.decode("utf-8-sig"))
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            return {"errors": ["Not valid UTF-8 JSON"], "sha256": sha}
+        try:
+            if isinstance(obj, dict) and "station" in obj and isinstance(obj.get("timetable"), dict):
+                station = with_default_aliases(Station.model_validate(obj["station"]))   # {station, timetable}
+                tti = TimetableIn.model_validate({**obj["timetable"], "station": station.id})
+            else:
+                tti = TimetableIn.model_validate(obj)
         except ValidationError as e:
             return {"errors": [f"{'.'.join(str(x) for x in er['loc'])}: {er['msg']}" for er in e.errors()], "sha256": sha}
         errs = referential_errors(station, tti)
         return {"errors": errs, "sha256": sha} if errs else \
-            {"timetable": tti, "sha256": sha, "sheet": None, "settings": {}, "excluded": []}
+            {"timetable": tti, "station": station, "sha256": sha, "sheet": None, "settings": {}, "excluded": []}
     settings: dict[str, int] = {}
     chosen: Optional[str] = None
+    st = station
     if name.endswith(".xlsx"):
         from openpyxl import load_workbook
         try:
@@ -226,6 +334,9 @@ def parse_upload(filename: str, data: bytes, station: Station, sheet: Optional[s
         hmap = candidates[chosen]
         wb_full = load_workbook(io.BytesIO(data), read_only=False, data_only=True)
         settings = _station_settings_xlsx(wb_full)
+        st, st_errors = _station_xlsx(wb_full, station, settings)
+        if st_errors:
+            return {"errors": st_errors, "sha256": sha, "sheet": chosen}
     elif name.endswith(".csv"):
         try:
             text = data.decode("utf-8-sig")
@@ -240,18 +351,17 @@ def parse_upload(filename: str, data: bytes, station: Station, sheet: Optional[s
         return {"errors": ["Only .xlsx, .csv and .json files are accepted"], "sha256": sha}
     if len([r for r in rows if r and any(v not in (None, "") for v in r)]) > MAX_ROWS:
         return {"errors": [f"More than {MAX_ROWS} rows"], "sha256": sha}
-    st = station.model_copy(update=settings) if settings else station
     trains, errors, excluded = _rows_to_trains(rows, hmap, st, 2, day)
     if not errors and not trains:
         errors = ["No train rows found"]
     if not errors:
         try:
-            tti = TimetableIn(station=station.id, day=day, trains=trains)
+            tti = TimetableIn(station=st.id, day=day, trains=trains)
         except ValidationError as e:
             errors = [er["msg"].removeprefix("Value error, ") for er in e.errors()]
     if errors:
         return {"errors": errors, "sha256": sha, "sheet": chosen}
-    return {"timetable": tti, "sha256": sha, "sheet": chosen, "settings": settings, "excluded": excluded}
+    return {"timetable": tti, "station": st, "sha256": sha, "sheet": chosen, "settings": settings, "excluded": excluded}
 
 
 def to_json(tti: TimetableIn) -> dict[str, Any]:

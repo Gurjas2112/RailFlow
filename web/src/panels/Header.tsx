@@ -21,7 +21,13 @@ export default function Header({ compact = false }: { compact?: boolean }) {
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2">
         <div className="mr-auto min-w-0">
           <div className="font-semibold">{t("app.name")}</div>
-          {!compact && <div className="truncate text-xs text-muted">{t("app.station")}</div>}
+          {!compact && (
+            <div className="truncate text-xs text-muted">
+              {s.scenario && s.scenario.station.id !== "SVNJ"
+                ? t("app.stationCustom", { name: s.scenario.station.name, code: s.scenario.station.id })
+                : t("app.station")}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2" aria-label={t("clock.label")}>

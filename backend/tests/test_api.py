@@ -174,3 +174,50 @@ def test_second_disruption_after_apply_uses_the_applied_plan(client, login):
     assert all(ro["validation"]["valid"] for ro in plan2["revisions"])
     a = {x["train_id"]: x for x in plan2["revisions"][0]["revision"]["assignments"]}
     assert a["11209"]["platform"] == "P4" and a["12222"]["arr"] >= 14 * 60 + 40
+
+
+def test_own_station_upload_assign_and_replan(client, login):
+    """Not the demo station: the template workbook's 3-platform station, end to end through the API."""
+    from conftest import DATA
+    login("controller")
+    data = (DATA.parent / "web" / "public" / "templates" / "railflow_template.xlsx").read_bytes()
+    r = client.post("/api/timetable/upload", files={"file": ("mine.xlsx", data)}).json()
+    assert r["station"]["id"] == "SHYR" and len(r["station"]["platforms"]) == 3
+    state = client.post("/api/scenario/load", json={"station": r["station"], "timetable": r["timetable"],
+                                                    "source": "upload:mine.xlsx"}).json()
+    assert state["station"]["name"] == "Sahyadri Road (fictional)" and len(state["trains"]) == 8
+    rep = client.post("/api/validate/scheduled").json()
+    assert sorted(c["code"] for c in rep["conflicts"]) == ["GAP_VIOLATION", "OVERLAP"]
+    plan = client.post("/api/assign", json={"now": "09:30"}).json()
+    assert all(ro["validation"]["valid"] for ro in plan["revisions"])
+    assert plan["revisions"][0]["recovery"] == "FULLY_ASSIGNED"
+    client.post(f"/api/revisions/{plan['revisions'][0]['revision']['id']}/apply")
+    parsed = client.post("/api/disruptions/parse", json={"text": "platform 2 closed 10:30 to 11:30, 12601 late 15 min",
+                                                         "now": "09:40"}).json()
+    ok = [p for p in parsed["proposals"] if p["status"] == "ok"]
+    assert sorted(p["type"] for p in ok) == ["closure", "delay"]
+    assert next(p for p in ok if p["type"] == "closure")["platform_id"] == "P2"
+    confirmed = [{"type": "delay", "train_id": p["train_id"], "minutes": p["minutes"], "kind": p["kind"]}
+                 if p["type"] == "delay" else
+                 {"type": "closure", "platform_id": p["platform_id"], "start": p["start"], "end": p["end"]}
+                 for p in ok]
+    plan = client.post("/api/plan", json={"confirmed": confirmed, "now": "09:40"}).json()
+    a = plan["revisions"][0]
+    assert a["validation"]["valid"]
+    on_p2 = [x for x in a["revision"]["assignments"] if x["platform"] == "P2" and x["arr"] is not None]
+    assert all(x["dep"] + 5 <= 10 * 60 + 30 or x["arr"] >= 11 * 60 + 30 for x in on_p2)
+
+
+def test_manual_timetable_before_now_starts_the_clock_before_its_first_train(client, login):
+    """Typed in by hand (or uploaded) with trains earlier than "now": the clock moves back, so no train loads frozen."""
+    login("controller")
+    station = {"id": "MAN", "name": "Manual Jn (fictional)", "min_gap": 5,
+               "platforms": [{"id": "P1", "name": "PF 1", "length_coaches": 24}, {"id": "P2", "name": "PF 2", "length_coaches": 24}]}
+    row = {"name": "Typed (fictional)", "type": "PAS", "origin": "AAA", "destination": "BBB", "direction": "UP",
+           "coaches": 12, "priority": 3, "platform": "P1", "allowed_platforms": ["P1", "P2"]}
+    trains = [{**row, "id": "51001", "arr": "09:00", "dep": "09:10"}, {**row, "id": "51003", "arr": "09:12", "dep": "09:20"}]
+    state = client.post("/api/scenario/load", json={"station": station, "timetable": {"trains": trains}, "source": "manual:MAN"}).json()
+    assert state["now"] == 8 * 60 + 30
+    assert {p["id"]: "platform 2" in p["aliases"] for p in state["station"]["platforms"]} == {"P1": False, "P2": True}
+    plan = client.post("/api/assign", json={"now": "08:30"}).json()
+    assert all(ro["validation"]["valid"] for ro in plan["revisions"])

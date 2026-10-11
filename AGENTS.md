@@ -43,7 +43,7 @@ backend/railflow/   main.py · admin.py · models.py · timeutil.py · state.py 
                     timetable_import.py · stt.py · manage.py · config.py · scenario_store.py
 backend/tests/      one file per SPEC §20 area (see §8 below)
 data/               shipped station + timetables + demo assets; generated timetable_peak.json, scenarios.json, parser_eval.jsonl
-tools/              make_data.py · gen_scenarios.py · bench.py · eval_parser.py · check_radio.py · reference/ (oracle)
+tools/              make_data.py · gen_scenarios.py · make_template.py · bench.py · eval_parser.py · check_radio.py · reference/ (oracle)
 results/            bench.md · parser_eval.md (committed, measured)
 web/src/            api/ (client + generated schema.d.ts) · design/tokens.css · i18n/ · store/sim.ts · sim/ · gantt/
                     panels/ · auth/ · admin/ · layout/
@@ -117,6 +117,6 @@ web: `locales.test.ts` · `pose.test.ts`.
 - [x] EN · हिं · मर locales complete — PASS (machine-checked; **native-speaker review still required**, §37)
 - [x] Single-process demo mode, `start.ps1` / `start.sh` — PASS
 - [x] Benchmark and parser evaluation committed with measured numbers — PASS
-- [~] Speech-to-text — BUILT and tested with a mocked model; `faster-whisper` is not installed on the build machine, so `tools/check_radio.py` has not been run against the real clips
+- [~] Speech-to-text — BUILT; `tools/check_radio.py` run with the real `small` model (2026-10-11): EN clip → delay 11209 +30 ok, closure time transcribed as "141530" (operator edits it); HI clip not usable. Needs `av==14.2.0` with faster-whisper 1.2.1
 - [ ] Route conflicts V11 (§48) — NOT BUILT (roadmap; limitation stated in README)
 - [ ] Real-phone-on-hotspot check, offline (Wi-Fi off) dry run, backup video — NOT DONE (needs the demo laptop and people)

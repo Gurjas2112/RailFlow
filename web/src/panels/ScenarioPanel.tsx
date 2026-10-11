@@ -4,6 +4,7 @@ import { api } from "../api/client";
 import { hhmm } from "../lib/time";
 import { renderConflict } from "../lib/reason";
 import { useSim } from "../store/sim";
+import TimetableEditor from "./TimetableEditor";
 import TimetableUpload from "./TimetableUpload";
 
 /** Built-in scenarios, Check as scheduled, Assign platforms, Reset, Inject planner fault (§14, §22). */
@@ -74,6 +75,7 @@ export default function ScenarioPanel() {
             {t("action.injectFault")}
           </label>
           <TimetableUpload />
+          <TimetableEditor />
         </>
       )}
       {report && (

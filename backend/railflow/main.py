@@ -34,7 +34,7 @@ from .proposals import normalise, validate_proposals
 from .reasons import classify_and_reason
 from .scenario_store import LOCK, builtin_scenarios, store
 from .security import SecurityMiddleware
-from .timetable_import import parse_upload, to_json
+from .timetable_import import parse_upload, to_json, with_default_aliases
 from .timeutil import to_min
 from .validator import VALIDATOR_VERSION, validate
 
@@ -120,7 +120,7 @@ def scenario_load(req: ScenarioLoadRequest, user: dict = Depends(controller)) ->
     if req.timetable is None:
         raise HTTPException(422, "Provide scenario_id, or a timetable (and optionally a station)")
     try:
-        station = Station.model_validate(req.station) if req.station else store.station
+        station = with_default_aliases(Station.model_validate(req.station)) if req.station else store.station
         tti = TimetableIn.model_validate(req.timetable)
     except ValidationError as e:
         raise HTTPException(422, [{"loc": list(x["loc"]), "msg": x["msg"].removeprefix("Value error, ")}
@@ -130,7 +130,12 @@ def scenario_load(req: ScenarioLoadRequest, user: dict = Depends(controller)) ->
     if errs:
         raise HTTPException(422, [{"loc": ["timetable"], "msg": m} for m in errs])
     source = req.source or "custom"
-    store.set(station, tti.to_timetable(), source, store.now, user["username"])
+    tt = tti.to_timetable()
+    # A timetable that starts before the current "now" would load with every train already arrived, hence frozen:
+    # start the clock 30 min before its first arrival instead, so Assign can still move every train.
+    first = min(t.arr for t in tt.trains)
+    now = store.now if first > store.now else max(0, first - 30)
+    store.set(station, tt, source, now, user["username"])
     audit.append(conn, actor(user), "load", f"{source} · {len(tti.trains)} trains",
                  payload_hash=db.sha256_text(db.canonical_json(req.timetable)))
     return store.state()
@@ -158,7 +163,7 @@ async def timetable_upload(file: UploadFile = File(...), sheet: Optional[str] = 
                  f"{'ok' if 'timetable' in res else 'needs_sheet' if 'needs_sheet' in res else 'errors'}",
                  payload_hash=res["sha256"])
     if "timetable" in res:
-        st = store.station.model_copy(update=res.get("settings") or {})
+        st = res["station"]                                   # loaded station + sheet settings, or the file's own
         return UploadResponse(timetable=to_json(res["timetable"]), station=st.model_dump(mode="json"),
                               sha256=res["sha256"], sheet=res.get("sheet"), excluded=res.get("excluded", []))
     if "needs_sheet" in res:

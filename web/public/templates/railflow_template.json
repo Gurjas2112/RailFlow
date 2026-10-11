@@ -1,0 +1,195 @@
+{
+  "station": {
+    "id": "SHYR",
+    "code": "SHYR",
+    "name": "Sahyadri Road (fictional)",
+    "min_gap": 5,
+    "max_hold": 30,
+    "platforms": [
+      {
+        "id": "P1",
+        "name": "PF 1",
+        "length_coaches": 24,
+        "use": "main line",
+        "goods_loop_wagons": 0
+      },
+      {
+        "id": "P2",
+        "name": "PF 2",
+        "length_coaches": 24,
+        "use": "main line + goods loop",
+        "goods_loop_wagons": 50
+      },
+      {
+        "id": "P3",
+        "name": "PF 3",
+        "length_coaches": 12,
+        "use": "bay · MEMU only",
+        "goods_loop_wagons": 0
+      }
+    ]
+  },
+  "timetable": {
+    "station": "SHYR",
+    "day": "Sun",
+    "trains": [
+      {
+        "id": "12601",
+        "name": "Sahyadri Superfast (fictional)",
+        "type": "SF",
+        "origin": "KRJ",
+        "destination": "LNL",
+        "direction": "DN",
+        "coaches": 22,
+        "wagons": null,
+        "days": "Daily",
+        "arr": "10:00",
+        "dep": "10:05",
+        "platform": "P1",
+        "required_platform": null,
+        "allowed_platforms": [
+          "P1",
+          "P2"
+        ],
+        "priority": 1
+      },
+      {
+        "id": "11605",
+        "name": "Deccan Mail (fictional)",
+        "type": "MEX",
+        "origin": "LNL",
+        "destination": "KRJ",
+        "direction": "UP",
+        "coaches": 22,
+        "wagons": null,
+        "days": "Daily",
+        "arr": "10:08",
+        "dep": "10:18",
+        "platform": "P1",
+        "required_platform": null,
+        "allowed_platforms": [
+          "P1",
+          "P2"
+        ],
+        "priority": 2
+      },
+      {
+        "id": "51607",
+        "name": "Ghat Passenger (fictional)",
+        "type": "PAS",
+        "origin": "KRJ",
+        "destination": "LNL",
+        "direction": "DN",
+        "coaches": 16,
+        "wagons": null,
+        "days": "Daily",
+        "arr": "10:20",
+        "dep": "10:30",
+        "platform": "P2",
+        "required_platform": null,
+        "allowed_platforms": [
+          "P1",
+          "P2"
+        ],
+        "priority": 3
+      },
+      {
+        "id": "61609",
+        "name": "Valley MEMU (fictional)",
+        "type": "MEMU",
+        "origin": "LNL",
+        "destination": "KRJ",
+        "direction": "UP",
+        "coaches": 12,
+        "wagons": null,
+        "days": "Daily",
+        "arr": "10:25",
+        "dep": "10:35",
+        "platform": "P3",
+        "required_platform": "P3",
+        "allowed_platforms": [
+          "P3"
+        ],
+        "priority": 3
+      },
+      {
+        "id": "GDS-2601",
+        "name": "Cement rake (fictional)",
+        "type": "GDS",
+        "origin": "KRJ",
+        "destination": "LNL",
+        "direction": "DN",
+        "coaches": null,
+        "wagons": 45,
+        "days": "Daily",
+        "arr": "10:40",
+        "dep": "11:10",
+        "platform": "P2",
+        "required_platform": null,
+        "allowed_platforms": [
+          "P2"
+        ],
+        "priority": 4
+      },
+      {
+        "id": "12611",
+        "name": "Plateau Express (fictional)",
+        "type": "SF",
+        "origin": "LNL",
+        "destination": "KRJ",
+        "direction": "UP",
+        "coaches": 24,
+        "wagons": null,
+        "days": "Daily",
+        "arr": "10:50",
+        "dep": "10:55",
+        "platform": "P1",
+        "required_platform": null,
+        "allowed_platforms": [
+          "P1",
+          "P2"
+        ],
+        "priority": 1
+      },
+      {
+        "id": "61613",
+        "name": "Valley MEMU (fictional)",
+        "type": "MEMU",
+        "origin": "KRJ",
+        "destination": "LNL",
+        "direction": "DN",
+        "coaches": 12,
+        "wagons": null,
+        "days": "Daily",
+        "arr": "11:00",
+        "dep": "11:10",
+        "platform": "P3",
+        "required_platform": "P3",
+        "allowed_platforms": [
+          "P3"
+        ],
+        "priority": 3
+      },
+      {
+        "id": "11615",
+        "name": "Coast Express (fictional)",
+        "type": "MEX",
+        "origin": "KRJ",
+        "destination": "LNL",
+        "direction": "DN",
+        "coaches": 22,
+        "wagons": null,
+        "days": "Daily",
+        "arr": "11:05",
+        "dep": "11:15",
+        "platform": "P2",
+        "required_platform": null,
+        "allowed_platforms": [
+          "P1",
+          "P2"
+        ],
+        "priority": 2
+      }
+    ]
+  }
+}
